@@ -1,0 +1,6 @@
+<div>
+    <b>---</b>
+	<div class="feed-title" tal:content="options/title" />
+	<div class="feed-date" tal:content="options/date" />
+	<div class="feed-content" tal:content="structure options/content" />
+</div>

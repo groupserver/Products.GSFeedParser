@@ -1,0 +1,11 @@
+<html>
+<head>
+<head>
+<body>
+    <span tal:replace="structure provider:groupserver.DisplayFeed">
+              Display Feed Provider
+    </span>
+
+	Hello World!
+</body>
+</html>
