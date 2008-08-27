@@ -7,6 +7,7 @@ from zope.contentprovider.interfaces import IContentProvider, UpdateNotCalled
 import Products.GSContent
 from Products.XWFCore.cache import LRUCache, SimpleCache
 from Products.Five import BrowserView
+from Products.XWFCore.XWFUtils import locateDataDirectory
 
 from interfaces import IGSFeedContentProvider
 
@@ -14,17 +15,11 @@ import os
 import md5
 import ConfigParser
 
-import config
-import data
 import pickle
 
 import logging
 
 log = logging.getLogger('GSFeedParser')
-
-
-DATADIR = os.path.dirname(data.__file__)
-CONFIGDIR = os.path.dirname(config.__file__)
 
 class GSFeedView(BrowserView):
     def __init__(self, context, request):
@@ -58,7 +53,8 @@ class GSFeedConfigReader(object):
     
     @property
     def config(self):
-        fname = os.path.join(CONFIGDIR, self.configId+'.ini')
+        configDir = locateDataDirectory('groupserver.GSFeedParser.config')
+        fname = os.path.join(configDir, self.configId+'.ini')
         c = ConfigParser.ConfigParser()
         try:
             c.read(fname)
@@ -102,14 +98,17 @@ class GSFeedContentProvider(object):
     def render(self):  
         if not self.__updated:
             raise UpdateNotCalled
-        retval = None
+        
+        retval = ''
         
         feed_urls = self.feed_config.urls
         feeds = []
         for url in feed_urls:
             fname = md5.new(url).hexdigest()
             try:
-                v = pickle.load(file(os.path.join(DATADIR, fname)))
+                dataDir = locateDataDirectory(
+                            'groupserver.GSFeedParser.data')
+                v = pickle.load(file(os.path.join(dataDir, fname)))
                 feeds.append(v)
             except:
                 pass
@@ -120,7 +119,6 @@ class GSFeedContentProvider(object):
             pageTemplate = PageTemplateFile(self.atomTemplate)
             self.cookedTemplates.add(self.atomTemplate, pageTemplate)
     
-        retval = ''
         for feed in feeds:
             for entry in feed.entries:
                 if entry.has_key('content'):
