@@ -11,11 +11,13 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('GSFeedParser.feedfetcher')
 
 MINIMUM_INTERVAL = 900 # seconds
+CONFIGPATH='/home/richard/workspace/groupserver/var/instance/groupserver.data/groupserver.GSFeedParser.config'
+DATAPATH='/home/richard/workspace/groupserver/var/instance/groupserver.data/groupserver.GSFeedParser.data'
 
 config = ConfigParser.ConfigParser()
 
-config_filenames = map(lambda x: os.path.join('config', x),
-                       os.listdir('config'))
+config_filenames = map(lambda x: os.path.join(CONFIGPATH, x),
+                                 os.listdir(CONFIGPATH))
 
 feed_config = {}
 
@@ -44,7 +46,7 @@ for filename in config_filenames:
                                 'md5': md5.new(url).hexdigest()}
 
 for url in feed_config:
-    out_filename = os.path.join('data', feed_config[url]['md5'])
+    out_filename = os.path.join(DATAPATH, feed_config[url]['md5'])
     out_filename_temp = out_filename+'.tmp'
     
     last_modified = None
