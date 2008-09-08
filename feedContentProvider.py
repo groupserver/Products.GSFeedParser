@@ -38,6 +38,8 @@ class GSFeedConfigReader(object):
         self.configId = '%'.join((self.siteRoot.getId(),
                                    self.siteInfo.get_id(),
                                    self.groupInfo.get_id()))
+        print self.configId
+        
     @property
     def urls(self):
         urls = []

@@ -1,6 +1,6 @@
 <li tal:define="date options/entry/date;
   munge_date python:modules['Products.XWFCore.XWFUtils'].munge_date"
-  class="feed">
+  class="feed-item">
   <a class="title" href="#"
     tal:attributes="href options/entry/link"
     tal:content="options/entry/title">A Feed Item</a>
