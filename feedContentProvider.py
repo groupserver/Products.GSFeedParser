@@ -91,7 +91,6 @@ class GSFeedContentProvider(object):
         self.groupName = self.groupInfo.get_name()
         self.groupId = self.groupInfo.get_id()
         self.siteId = self.siteInfo.get_id()
-        self.user = self.request.AUTHENTICATED_USER
         
         self.__updated = True
           
@@ -112,7 +111,6 @@ class GSFeedContentProvider(object):
                 feeds.append(v)
             except:
                 pass
-        
         pageTemplate = self.cookedTemplates.get(self.atomTemplate)
               
         if not pageTemplate:
@@ -131,10 +129,8 @@ class GSFeedContentProvider(object):
                       
                 if isinstance(content, dict):
                     content = content.value
-                      
-                retval += pageTemplate(title=entry.title,
-                                       date=entry.updated,
-                                       content=content)
+                retval += pageTemplate(view=self,
+                                       entry=entry)
               
         return retval
           

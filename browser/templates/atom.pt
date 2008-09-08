@@ -1,6 +1,13 @@
-<div>
-    <b>---</b>
-	<div class="feed-title" tal:content="options/title" />
-	<div class="feed-date" tal:content="options/date" />
-	<div class="feed-content" tal:content="structure options/content" />
-</div>
+<li tal:define="date options/entry/date;
+  munge_date python:modules['Products.XWFCore.XWFUtils'].munge_date"
+  class="feed">
+  <a class="title" href="#"
+    tal:attributes="href options/entry/link"
+    tal:content="options/entry/title">A Feed Item</a>
+  <span class="posted">
+    Posted at
+  	<span class="date" 
+	    tal:content="python:munge_date(options['view'].context, date)">
+	    Today, Tomorrow, Timaru</span>
+  </span>
+</li>
