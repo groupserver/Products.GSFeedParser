@@ -6,6 +6,12 @@
   <browser:page for="*" name="feedtest"
   	class=".feedContentProvider.GSFeedView"
     template="browser/templates/feed.pt" permission="zope2.View" />
+
+  <browser:page for="*" 
+    name="feed.ajax"
+  	class=".feedContentProvider.GSFeedView"
+    template="browser/templates/feed_ajax.pt" 
+    permission="zope2.View" />
 	
   <interface interface=".interfaces.IGSFeedContentProvider"
     type="zope.contentprovider.interfaces.ITALNamespaceData"/>
