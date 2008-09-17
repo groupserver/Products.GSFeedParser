@@ -1,5 +1,5 @@
 from zope.interface import Interface 
-from zope.schema import Bool, Text, Field
+from zope.schema import Bool, Text, Field, URI
 
 class IGSFeedContentProvider(Interface):
     """ A content provider for displaying parsed ATOM or RSS feeds.
@@ -30,3 +30,9 @@ class IGSFeedContentProvider(Interface):
                                 that is used to render the post.""",
                                 required=False,
                                 default=u"browser/templates/postMessage.pt")
+
+class IGSChangeWebFeed(Interface):
+    feedUrl = URI(title=u'Web Feed Address',
+      description=u'The address of the web feed you wish to display',
+      required=False)
+

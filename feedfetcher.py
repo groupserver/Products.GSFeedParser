@@ -1,3 +1,4 @@
+# coding=utf-8
 import feedparser
 
 import ConfigParser
@@ -11,8 +12,8 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('GSFeedParser.feedfetcher')
 
 MINIMUM_INTERVAL = 900 # seconds
-CONFIGPATH='/home/richard/workspace/groupserver/var/instance/groupserver.data/groupserver.GSFeedParser.config'
-DATAPATH='/home/richard/workspace/groupserver/var/instance/groupserver.data/groupserver.GSFeedParser.data'
+CONFIGPATH='/opt/groupserver-1.0-alpha/var/instance/groupserver.data/groupserver.GSFeedParser.config'
+DATAPATH='/opt/groupserver-1.0-alpha/var/instance/groupserver.data/groupserver.GSFeedParser.data'
 
 config = ConfigParser.ConfigParser()
 
