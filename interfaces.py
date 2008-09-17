@@ -32,7 +32,7 @@ class IGSFeedContentProvider(Interface):
                                 default=u"browser/templates/postMessage.pt")
 
 class IGSChangeWebFeed(Interface):
-    feedUrl = URI(title=u'Web Feed Address',
+    feedUri = URI(title=u'Web Feed Address',
       description=u'The address of the web feed you wish to display',
       required=False)
 
