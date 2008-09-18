@@ -5,7 +5,6 @@
     tal:attributes="href options/entry/link"
     tal:content="options/entry/title">A Feed Item</a>
   <span class="posted">
-    Posted at
   	<span class="date" 
 	    tal:content="python:munge_date(options['view'].context, date)">
 	    Today, Tomorrow, Timaru</span>
