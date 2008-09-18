@@ -19,7 +19,13 @@
    <browser:page 
     for="Products.GSContent.interfaces.IGSSiteFolder"
     name="admin_change_feed.html"
-    class=".changefeed.GSChangeWebFeedForm"
+    class=".changefeed.GSChangeWebFeedSiteForm"
+    permission="zope2.ManageProperties" />
+
+   <browser:page 
+    for="Products.XWFChat.interfaces.IGSGroupFolder"
+    name="admin_change_feed.html"
+    class=".changefeed.GSChangeWebFeedGroupForm"
     permission="zope2.ManageProperties" />
 
 </configure>

@@ -10,15 +10,18 @@ from Products.Five.browser.pagetemplatefile import ZopeTwoPageTemplateFile
 from interfaces import IGSChangeWebFeed
 from feedfetcher import CONFIGPATH
 
-class GSChangeWebFeedForm(PageForm):
+class GSChangeWebFeedSiteForm(PageForm):
     label = u'Change Web Feed'
-    pageTemplateFileName = 'browser/templates/changefeed.pt'
+    pageTemplateFileName = 'browser/templates/changefeedsite.pt'
     template = ZopeTwoPageTemplateFile(pageTemplateFileName)
     form_fields = form.Fields(IGSChangeWebFeed)
       
     def __init__(self, context, request):
         PageForm.__init__(self, context, request)
         self.siteInfo = createObject('groupserver.SiteInfo', context)
+        self.statusStart = u'Web feed for '\
+          u'<a class="site" href="%s">%s</a> is set to '%\
+          (self.siteInfo.url, self.siteInfo.name)
 
     @form.action(label=u'Change', failure='handle_change_action_failure')
     def handle_change(self, action, data):
@@ -27,10 +30,8 @@ class GSChangeWebFeedForm(PageForm):
         
         self.set_feed_uri(data['feedUri'])
         
-        self.status = u'Web feed for <a href="%s">%s</a> set to '\
-          u'<a href="%s"><code>%s</code></a>.' % \
-          (self.siteInfo.url, self.siteInfo.name,
-           data['feedUri'], data['feedUri'])
+        self.status = u'<a href="%s"><code>%s</code></a>.' % \
+          (self.statusStart, data['feedUri'], data['feedUri'])
         assert self.status
         assert type(self.status) == unicode
 
@@ -44,12 +45,12 @@ class GSChangeWebFeedForm(PageForm):
         config = ConfigParser.ConfigParser()
         config.read(self.configFileName)
         
-        if not(config.has_section('SiteHome')):
-            config.add_section('SiteHome')
+        if not(config.has_section('Home')):
+            config.add_section('Home')
         
-        config.set('SiteHome', 'name', 
-          u'Feed displayed on the site homepage')
-        config.set('SiteHome', 'url', uri)
+        config.set('Home', 'name', 
+          u'Feed displayed on the homepage')
+        config.set('Home', 'url', uri)
         
         config.write(open(self.configFileName, 'w'))
         
@@ -60,4 +61,24 @@ class GSChangeWebFeedForm(PageForm):
         siteConfigFile = os.path.join(CONFIGPATH, fn)
         print siteConfigFile 
         return siteConfigFile
+
+class GSChangeWebFeedGroupForm(GSChangeWebFeedSiteForm):
+    pageTemplateFileName = 'browser/templates/changefeedgroup.pt'
+    template = ZopeTwoPageTemplateFile(pageTemplateFileName)
+    def __init__(self, context, request):
+        PageForm.__init__(self, context, request)
+        self.siteInfo = createObject('groupserver.SiteInfo', context)
+        self.groupInfo = createObject('groupserver.GroupInfo', context)
+        self.statusStart = u'Web feed for '\
+          u'<a class="group" href="%s">%s</a> is set to '%\
+          (self.groupInfo.url, self.groupInfo.name)
+        
+    @property
+    def configFileName(self):
+        groupServerId = self.context.site_root().getId()
+        p = (groupServerId, self.siteInfo.id, self.groupInfo.id)
+        fn = '%'.join(p) + '.ini'
+        groupConfigFile = os.path.join(CONFIGPATH, fn)
+        print groupConfigFile
+        return groupConfigFile
 

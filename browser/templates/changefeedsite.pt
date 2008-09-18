@@ -7,7 +7,7 @@
   metal:use-macro="context/@@groupserver_layout/page">
   <head>
     <title metal:fill-slot="title">
-      <span tal:replace="string:${view/label}: ${view/siteInfo/get_name}">
+      <span tal:replace="string:${view/label}: ${view/siteInfo/title}">
         Edit Feed
       </span>
     </title>
