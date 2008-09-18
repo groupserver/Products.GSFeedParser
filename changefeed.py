@@ -22,7 +22,7 @@ class GSChangeWebFeedSiteForm(PageForm):
     label = u'Change Web Feed'
     pageTemplateFileName = 'browser/templates/changefeedsite.pt'
     template = ZopeTwoPageTemplateFile(pageTemplateFileName)
-    form_fields = form.Fields(IGSChangeWebFeed)
+    form_fields = form.Fields(IGSChangeWebFeed, render_context=False)
       
     def __init__(self, context, request):
         PageForm.__init__(self, context, request)
@@ -30,6 +30,9 @@ class GSChangeWebFeedSiteForm(PageForm):
         self.statusStart = u'Web feed for '\
           u'<a class="site" href="%s">%s</a>'%\
           (self.siteInfo.url, self.siteInfo.name)
+
+        if not(request.form.has_key('form.feedUri')):
+            request.form['form.feedUri'] = self.get_feed_uri()
 
     @form.action(label=u'Change', failure='handle_change_action_failure')
     def handle_change(self, action, data):
@@ -55,6 +58,16 @@ class GSChangeWebFeedSiteForm(PageForm):
         else:
             self.status = u'<p>There are errors:</p>'
 
+    def get_feed_uri(self):
+        config = ConfigParser.ConfigParser()
+        config.read(self.configFileName)
+        
+        retval = ''
+        if config.has_section('Home'):
+            retval = config.get('Home', 'url')
+        print 'Feed: %s' % retval
+        return retval
+        
     def set_feed_uri(self, uri):
         m = u'Setting web feed URI for %s to %s' % \
           (self.configFileName, uri)
@@ -77,7 +90,6 @@ class GSChangeWebFeedSiteForm(PageForm):
             config.write(open(self.configFileName, 'w'))
         finally:
             _thread_lock.release()
-
 
     def clear_feed_uri(self):
         m = u'Clearing web feed URI for %s' % self.configFileName
@@ -108,8 +120,7 @@ class GSChangeWebFeedGroupForm(GSChangeWebFeedSiteForm):
     pageTemplateFileName = 'browser/templates/changefeedgroup.pt'
     template = ZopeTwoPageTemplateFile(pageTemplateFileName)
     def __init__(self, context, request):
-        PageForm.__init__(self, context, request)
-        self.siteInfo = createObject('groupserver.SiteInfo', context)
+        GSChangeWebFeedSiteForm.__init__(self, context, request)
         self.groupInfo = createObject('groupserver.GroupInfo', context)
         self.statusStart = u'Web feed for '\
           u'<a class="group" href="%s">%s</a> is set to '%\
