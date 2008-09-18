@@ -10,6 +10,10 @@ from Products.Five.browser.pagetemplatefile import ZopeTwoPageTemplateFile
 from interfaces import IGSChangeWebFeed
 from Products.XWFCore.XWFUtils import locateDataDirectory
 
+import logging
+log = logging.getLogger('GSFeedParser') #@UndefinedVariable
+
+
 CONFIGPATH = locateDataDirectory('groupserver.GSFeedParser.config')
 
 _thread_lock = ThreadLock.allocate_lock()
@@ -24,7 +28,7 @@ class GSChangeWebFeedSiteForm(PageForm):
         PageForm.__init__(self, context, request)
         self.siteInfo = createObject('groupserver.SiteInfo', context)
         self.statusStart = u'Web feed for '\
-          u'<a class="site" href="%s">%s</a> is set to '%\
+          u'<a class="site" href="%s">%s</a>'%\
           (self.siteInfo.url, self.siteInfo.name)
 
     @form.action(label=u'Change', failure='handle_change_action_failure')
@@ -32,10 +36,16 @@ class GSChangeWebFeedSiteForm(PageForm):
         assert self.context
         assert self.form_fields
         
-        self.set_feed_uri(data['feedUri'])
+        if data.get('feedUri', ''):
+            self.set_feed_uri(data['feedUri'])
+            self.status = u'%s is set to '\
+              u'<a href="%s"><code>%s</code></a>.' % \
+              (self.statusStart, data['feedUri'], data['feedUri'])
+        else:
+            self.clear_feed_uri()
+            self.status = u'%s has been switched off.' % self.statusStart
+            
         
-        self.status = u'<a href="%s"><code>%s</code></a>.' % \
-          (self.statusStart, data['feedUri'], data['feedUri'])
         assert self.status
         assert type(self.status) == unicode
 
@@ -46,6 +56,10 @@ class GSChangeWebFeedSiteForm(PageForm):
             self.status = u'<p>There are errors:</p>'
 
     def set_feed_uri(self, uri):
+        m = u'Setting web feed URI for %s to %s' % \
+          (self.configFileName, uri)
+        log.info(m)
+
         config = ConfigParser.ConfigParser()
         config.read(self.configFileName)
         
@@ -63,13 +77,31 @@ class GSChangeWebFeedSiteForm(PageForm):
             config.write(open(self.configFileName, 'w'))
         finally:
             _thread_lock.release()
+
+
+    def clear_feed_uri(self):
+        m = u'Clearing web feed URI for %s' % self.configFileName
+        log.info(m)
+
+        config = ConfigParser.ConfigParser()
+        config.read(self.configFileName)
+        
+        if config.has_section('Home'):
+            config.remove_section('Home')
+        
+        # avoid internal race conditions on write without using
+        # file handle tricks
+        try:
+            _thread_lock.acquire()
+            config.write(open(self.configFileName, 'w'))
+        finally:
+            _thread_lock.release()
         
     @property
     def configFileName(self):
         groupServerId = self.context.site_root().getId()
         fn = '%'.join((groupServerId, self.siteInfo.id, '')) + '.ini'
         siteConfigFile = os.path.join(CONFIGPATH, fn)
-        print siteConfigFile 
         return siteConfigFile
 
 class GSChangeWebFeedGroupForm(GSChangeWebFeedSiteForm):
@@ -89,6 +121,5 @@ class GSChangeWebFeedGroupForm(GSChangeWebFeedSiteForm):
         p = (groupServerId, self.siteInfo.id, self.groupInfo.id)
         fn = '%'.join(p) + '.ini'
         groupConfigFile = os.path.join(CONFIGPATH, fn)
-        print groupConfigFile
         return groupConfigFile
 
