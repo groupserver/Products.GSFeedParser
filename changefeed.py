@@ -1,6 +1,6 @@
 # coding=utf-8
-
 import ConfigParser, os
+import ThreadLock
 
 from zope.formlib import form
 from zope.component import createObject
@@ -8,7 +8,11 @@ from Products.Five.formlib.formbase import PageForm
 from Products.Five.browser.pagetemplatefile import ZopeTwoPageTemplateFile
 
 from interfaces import IGSChangeWebFeed
-from feedfetcher import CONFIGPATH
+from Products.XWFCore.XWFUtils import locateDataDirectory
+
+CONFIGPATH = locateDataDirectory('groupserver.GSFeedParser.config')
+
+_thread_lock = ThreadLock.allocate_lock()
 
 class GSChangeWebFeedSiteForm(PageForm):
     label = u'Change Web Feed'
@@ -52,7 +56,13 @@ class GSChangeWebFeedSiteForm(PageForm):
           u'Feed displayed on the homepage')
         config.set('Home', 'url', uri)
         
-        config.write(open(self.configFileName, 'w'))
+        # avoid internal race conditions on write without using
+        # file handle tricks
+        try:
+            _thread_lock.acquire()
+            config.write(open(self.configFileName, 'w'))
+        finally:
+            _thread_lock.release()
         
     @property
     def configFileName(self):

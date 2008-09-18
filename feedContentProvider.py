@@ -5,7 +5,7 @@ from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 from zope.contentprovider.interfaces import IContentProvider, UpdateNotCalled
 
 import Products.GSContent
-from Products.XWFCore.cache import LRUCache, SimpleCache
+from Products.XWFCore.cache import SimpleCache
 from Products.Five import BrowserView
 from Products.XWFCore.XWFUtils import locateDataDirectory
 
@@ -19,7 +19,7 @@ import pickle
 
 import logging
 
-log = logging.getLogger('GSFeedParser')
+log = logging.getLogger('GSFeedParser') #@UndefinedVariable
 
 class GSFeedView(BrowserView):
     def __init__(self, context, request):
