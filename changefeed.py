@@ -59,13 +59,13 @@ class GSChangeWebFeedSiteForm(PageForm):
             self.status = u'<p>There are errors:</p>'
 
     def get_feed_uri(self):
+        assert hasattr(self, 'configFileName')
         config = ConfigParser.ConfigParser()
         config.read(self.configFileName)
         
         retval = ''
         if config.has_section('Home'):
             retval = config.get('Home', 'url')
-        print 'Feed: %s' % retval
         return retval
         
     def set_feed_uri(self, uri):
@@ -120,8 +120,11 @@ class GSChangeWebFeedGroupForm(GSChangeWebFeedSiteForm):
     pageTemplateFileName = 'browser/templates/changefeedgroup.pt'
     template = ZopeTwoPageTemplateFile(pageTemplateFileName)
     def __init__(self, context, request):
+        # --=mpj17=-- Trick for young players: if the groupInfo is
+        #   not set early then Badness Happens.
+        self.groupInfo = createObject('groupserver.GroupInfo', 
+                                      context)
         GSChangeWebFeedSiteForm.__init__(self, context, request)
-        self.groupInfo = createObject('groupserver.GroupInfo', context)
         self.statusStart = u'Web feed for '\
           u'<a class="group" href="%s">%s</a> is set to '%\
           (self.groupInfo.url, self.groupInfo.name)
