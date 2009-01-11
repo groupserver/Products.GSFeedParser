@@ -126,7 +126,7 @@ class GSFeedContentProvider(object):
                     else:
                         content = entry.content[0]
                 else:
-                    content = entry.summary
+                    content = getattr(entry, 'summary', '')
                       
                 if isinstance(content, dict):
                     content = content.value
