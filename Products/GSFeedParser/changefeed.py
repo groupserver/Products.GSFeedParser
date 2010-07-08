@@ -1,10 +1,15 @@
 # coding=utf-8
 import ConfigParser, os
-import ThreadLock
+from threading import Lock
+
+try:
+    from five.formlib.formbase import PageForm
+except ImportError:
+    from Products.Five.formlib.formbase import PageForm
+    
 
 from zope.formlib import form
 from zope.component import createObject
-from Products.Five.formlib.formbase import PageForm
 from Products.Five.browser.pagetemplatefile import ZopeTwoPageTemplateFile
 
 from interfaces import IGSChangeWebFeed
@@ -16,7 +21,7 @@ log = logging.getLogger('GSFeedParser') #@UndefinedVariable
 
 CONFIGPATH = locateDataDirectory('groupserver.GSFeedParser.config')
 
-_thread_lock = ThreadLock.allocate_lock()
+_thread_lock = Lock()
 
 class GSChangeWebFeedSiteForm(PageForm):
     label = u'Change Web Feed'
