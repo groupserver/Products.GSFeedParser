@@ -1,6 +1,6 @@
 # coding=utf-8
 import ConfigParser, os
-from threading import Lock
+from threading import RLock
 
 try:
     from five.formlib.formbase import PageForm
@@ -21,7 +21,7 @@ log = logging.getLogger('GSFeedParser') #@UndefinedVariable
 
 CONFIGPATH = locateDataDirectory('groupserver.GSFeedParser.config')
 
-_thread_lock = Lock()
+_thread_lock = RLock()
 
 class GSChangeWebFeedSiteForm(PageForm):
     label = u'Change Web Feed'
